@@ -1,2 +1,4 @@
-WAIT
----START---
+---OP--
+ARM
+---PL---
+msg * hello world
