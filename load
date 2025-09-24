@@ -1,4 +1,4 @@
 ---EC---
-HALT
+EXEC
 ---PL---
 msg * bye world
