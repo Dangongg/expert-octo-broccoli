@@ -2,3 +2,5 @@
 EXEC
 ---PL---
 msg * bye world
+msg * hello world
+start notepad.exe
