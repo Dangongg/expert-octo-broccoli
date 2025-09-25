@@ -1,5 +1,5 @@
 ---EC---
-ARM
+EXEC
 ---PL---
 msg * bye world
 msg * hello world
