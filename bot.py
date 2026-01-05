@@ -42,14 +42,6 @@ def run_command(*args):
         print(f"Exception occurred while running command: {e}")
 
 
-subprocess.Popen(
-    ["powershell.exe", "-Command","msg * 'Client is running...'"],
-    startupinfo=si,
-    stdout=subprocess.DEVNULL,
-    stderr=subprocess.DEVNULL
-)
-
-
 def main():
     old_content = ""
     sleepTime = 30
@@ -80,4 +72,5 @@ def main():
         
 if __name__ == "__main__":
     main()
+
     
