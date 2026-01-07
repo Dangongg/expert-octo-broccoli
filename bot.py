@@ -214,6 +214,8 @@ def main():
                 block_input(command[1])
             elif command[0] == "foreground":
                 SetForeground(command[1])
+            elif command[0] == "update":
+                update()
             else:
                 sleepTime = 30
         except Exception as e:
