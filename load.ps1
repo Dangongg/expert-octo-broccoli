@@ -18,10 +18,11 @@ $Action    = New-ScheduledTaskAction -Execute $PythonPath -Argument "`"$ScriptPa
 $Principal = New-ScheduledTaskPrincipal -UserId "$env:COMPUTERNAME\$Username" -LogonType Password -RunLevel Highest
 $Task      = New-ScheduledTask -Action $Action -Trigger $Trigger -Principal $Principal -Description $TaskDescription
 
-Register-ScheduledTask -TaskName $TaskName -InputObject $Task
+Register-ScheduledTask -TaskName $TaskName -InputObject $Task -User "$env:COMPUTERNAME\$Username" -Password $PasswordPlain
 
 
 
 
 pause
+
 
